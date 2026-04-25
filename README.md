@@ -1,3 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixBot AI 🔧</title>
+<style>
+body{font-family:system-ui;background:#f0f0f0;margin:0;padding:20px}
+.box{max-width:500px;margin:0 auto;background:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+h2{color:#00C2A8;margin:0 0 15px}
+textarea,select{width:100%;padding:12px;border:2px solid #00C2A8;border-radius:8px;font-size:16px;margin-bottom:10px;box-sizing:border-box}
+button{background:#00C2A8;color:white;padding:14px;border:none;border-radius:8px;font-size:18px;width:100%;font-weight:bold}
+#answer{margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;min-height:50px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>FixBot AI 🔧</h2>
+<p>Your AI phone technician. Describe any fault:</p>
+
+<select id="quicklist" onchange="document.getElementById('p').value=this.value;if(this.value)ask()">
+  <option value="">🔧 Select Common Fault - Lagos Top 20</option>
+  <option value="iPhone 11 black screen but vibrates">iPhone 11 Black Screen + Vibrate</option>
+  <option value="iPhone X Face ID not working">iPhone X Face ID Failed</option>
+  <option value="Samsung A12 not charging">Samsung A12 Not Charging</option>
+  <option value="Samsung S21 overheating">Samsung S21 Overheating</option>
+  <option value="Tecno Spark 10 stuck on logo">Tecno Spark 10 Stuck on Logo</option>
+  <option value="Tecno Camon 20 battery drains fast">Tecno Camon 20 Battery Drain</option>
+  <option value="Infinix Hot 12 no service">Infinix Hot 12 No Network</option>
+  <option value="Infinix Note 30 ghost touch">Infinix Note 30 Ghost Touch</option>
+  <option value="Water damaged iPhone won't turn on">Water Damage Won't Turn On</option>
+  <option value="Phone dropped screen cracked no display">Cracked Screen No Display</option>
+</select>
+
+<textarea id="p" rows="3" placeholder="e.g., iPhone 11 black screen but still vibrates"></textarea>
+<button onclick="ask()">Diagnose Now</button>
+<div id="answer"></div>
+</div>
+
+<script>
+const API_KEY = 'sk-YOUR_KEY_HERE'; // REPLACE THIS WITH YOUR REAL KEY
+
+async function ask(){
+  const p = document.getElementById('p').value;
+  const a = document.getElementById('answer');
+  if(!p) return a.innerHTML = '<span style="color:red">Type your phone issue first</span>';
+
+  a.innerHTML = '⏳ Scanning hardware...';
+
+  try{
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',
+        messages:[{
+          role:'system',
+          content:'You are FixBot AI for Nigerian phone technicians. Diagnose in this format: Fault: [name]\\nConfidence: [0-100]%\\nLikely Parts: [list]\\nPrice: ₦[range]\\nRisk: Low/Medium/High\\nSteps: [numbered list]. Be brief.'
+        },{
+          role:'user',
+          content:p
+        }],
+        max_tokens:300
+      })
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message);
+    a.innerHTML = d.choices[0].message.content.replace(/\n/g,'<br>');
+  }catch(e){
+    a.innerHTML = '<span style="color:red">⚠️ Error: '+e.message+'<br>Check your API key or data.</span>';
+  }
+}
+</script>
+</body>
+</html>
 // === VIDEO REPAIR GUIDES ===
 const VIDEO_DB = {
   'black screen': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
