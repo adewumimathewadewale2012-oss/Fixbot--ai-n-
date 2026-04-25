@@ -53,3 +53,41 @@ async function askFixBot() {
 </script>
 </body>
 </html>
+// === NEW FEATURE 1: Copy Button + History ===
+let history = JSON.parse(localStorage.getItem('fixbotHistory') || '[]');
+
+function saveHistory(q, a) {
+  history.unshift({q: q, a: a, t: new Date().toLocaleTimeString()});
+  history = history.slice(0, 5); // Keep last 5
+  localStorage.setItem('fixbotHistory', JSON.stringify(history));
+  showHistory();
+}
+
+function showHistory() {
+  let h = document.getElementById('history');
+  if (!h) {
+    document.body.insertAdjacentHTML('beforeend', `<div id="history" style="margin-top:20px;padding:15px;background:#f5f5f5;border-radius:8px"><b>Recent Fixes:</b><div id="hlist"></div></div>`);
+    h = document.getElementById('history');
+  }
+  document.getElementById('hlist').innerHTML = history.map(i => 
+    `<div style="padding:8px 0;border-bottom:1px solid #ddd"><b>${i.t}</b> - ${i.q}<br><small>${i.a.substring(0,80)}...</small></div>`
+  ).join('') || 'No history yet';
+}
+
+function copyAnswer() {
+  navigator.clipboard.writeText(document.getElementById('a').innerText);
+  alert('Copied to clipboard ✅');
+}
+
+// === NEW FEATURE 2: Better Loading + Error Handling ===
+const oldAsk = ask;
+ask = async function() {
+  const p = document.getElementById('p').value;
+  const a = document.getElementById('a');
+  if(!p) return a.innerHTML = '<span style="color:red">Type your phone issue first</span>';
+  
+  a.innerHTML = '<div style="text-align:center">⏳ <b>Scanning hardware...</b><br><small>Checking Fault DB + Price List</small></div>';
+  
+  try {
+    await oldAsk();
+    saveHistory(p, a.innerText);
