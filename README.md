@@ -1,4 +1,45 @@
-<!DOCTYPE html>
+// === VIDEO REPAIR GUIDES ===
+const VIDEO_DB = {
+  'black screen': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  'not charging': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  'stuck on logo': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  'water damage': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  'battery drain': 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+};
+
+function addVideoGuide(issue, answerDiv) {
+  let videoUrl = '';
+  for(let key in VIDEO_DB) {
+    if(issue.toLowerCase().includes(key)) {
+      videoUrl = VIDEO_DB[key];
+      break;
+    }
+  }
+
+  if(videoUrl) {
+    answerDiv.innerHTML += `
+    <div style="margin-top:15px;padding:15px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px">
+      <b>🎥 Video Repair Guide</b>
+      <div style="position:relative;padding-bottom:56.25%;height:0;margin-top:10px">
+        <iframe src="${videoUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:6px" allowfullscreen></iframe>
+      </div>
+      <button onclick="alert('Pro feature: Download HD video')" style="background:#FF6B00;color:white;padding:8px 12px;border:none;border-radius:6px;margin-top:10px;width:100%">⭐ Upgrade to Pro for HD + No Ads</button>
+    </div>`;
+  } else {
+    answerDiv.innerHTML += `<p style="margin-top:15px;font-size:14px;color:#666">🎥 Video guide coming soon. <b>Need video? Upgrade Pro.</b></p>`;
+  }
+}
+
+// Hook into existing ask function
+const oldAsk2 = ask;
+ask = async function() {
+  const p = document.getElementById('p').value;
+  await oldAsk2();
+  const a = document.getElementById('a');
+  if(a.innerText.includes('Fault:')) {
+    addVideoGuide(p, a);
+  }
+}<!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
